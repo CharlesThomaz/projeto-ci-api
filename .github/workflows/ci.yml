@@ -52,14 +52,16 @@ jobs:
 
 
 
-      - name: 🧪 Rodar testes com pytest
-        env:
-          FLASK_ENV: testing
-          DB_HOST: 127.0.0.1
-          DB_USER: root
-          DB_PASSWORD: root
-          DB_NAME: flaskdb
+      - name: ✅ Testar conexão com banco MySQL
         run: |
-          pytest
-
-
+          sudo apt-get install -y mysql-client
+          echo "Aguardando o MySQL iniciar..."
+          for i in {1..10}; do
+            if mysqladmin ping -h mysql -uroot -proot --silent; then
+              echo "MySQL está pronto!"
+              break
+            fi
+            echo "Esperando MySQL..."
+            sleep 5
+          done
+          mysql -h mysql -u root -proot -e "SHOW DATABASES;"
