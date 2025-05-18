@@ -49,12 +49,16 @@ jobs:
       - name: 🐳 Validar Dockerfile
         run: docker build -t flask-app .  # Faz o build da imagem Docker da aplicação
 
+
+
       - name: 🧪 Rodar testes com pytest
-  env:
-    FLASK_ENV: testing
-    DB_HOST: 127.0.0.1
-    DB_USER: root
-    DB_PASSWORD: root
-    DB_NAME: flaskdb
-  run: |
-    pytest
+        env:
+          FLASK_ENV: testing
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: flaskdb
+        run: |
+          pytest
+
+
