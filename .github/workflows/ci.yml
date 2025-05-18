@@ -21,11 +21,12 @@ jobs:
           MYSQL_DATABASE: flaskdb  # Banco de dados que será criado automaticamente
         ports:
           - 3306:3306  # Mapeia a porta do container para a máquina do runner
-        options: >-  # Configura um healthcheck para o container MySQL
-          --health-cmd="mysqladmin ping --silent"  # Comando usado para verificar se o MySQL está pronto
-          --health-interval=10s  # Intervalo entre as tentativas
-          --health-timeout=5s  # Tempo limite para cada tentativa
-          --health-retries=3  # Número máximo de tentativas
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
 
     steps:
       - name: ⬇️ Checkout do código
