@@ -1,15 +1,17 @@
 name: CI/CD - Flask Docker App
 
+# 🚀 Quando essa pipeline será executada
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]  # Quando houver push na branch principal
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ]  # Quando alguém abrir um PR para a branch principal
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Máquina virtual que executa a pipeline
 
+    # 🔌 Serviços auxiliares (como o banco de dados MySQL)
     services:
       mysql:
         image: mysql:5.7
@@ -25,30 +27,30 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: ⬇️ Checkout do código
+
+      ### 1. ⬇️ Baixar o código do repositório
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: 🐍 Configurar Python
+      ### 2. 🐍 Preparar o ambiente Python
+      - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: 📦 Instalar dependências
+      ### 3. 📦 Instalar as dependências do projeto
+      - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🐳 Validar Dockerfile
-        run: docker build -t flask-app .
-
-      - name: 🐬 Instalar cliente MySQL
-        run: sudo apt-get install -y mysql-client
-
-      - name: ⏳ Aguardar MySQL estar pronto
+      ### 4. 🕵️‍♂️ Verificar se o MySQL está pronto
+      - name: Esperar o MySQL iniciar
         run: |
+          sudo apt-get install -y mysql-client
           echo "Aguardando o MySQL iniciar..."
           for i in {1..10}; do
-            if mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; then
+            if mysqladmin ping -h mysql -uroot -proot --silent; then
               echo "MySQL está pronto!"
               break
             fi
@@ -56,5 +58,20 @@ jobs:
             sleep 5
           done
 
-      - name: ✅ Testar conexão com banco MySQL
-        run: mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"
+      ### 5. 🧪 Testar conexão com o banco
+      - name: Testar conexão com banco MySQL
+        run: |
+          mysql -h mysql -u root -proot -e "SHOW DATABASES;"
+
+      ### 6. 🧪 (Opcional) Rodar testes automatizados
+      # - name: Executar testes
+      #   run: |
+      #     pytest  # ou outro framework que você estiver usando
+
+      ### 7. 🐳 Validar o Dockerfile (build da imagem)
+      - name: Build da imagem Docker
+        run: docker build -t flask-app .
+
+      ### 8. (Opcional) Push para DockerHub ou Deploy
+      # - name: Push para DockerHub
+      #   run: docker push seu-usuario/seu-repositorio
