@@ -1,2 +1,5 @@
 flask
 flask-mysqldb
+
+pytest
+pytest-flask

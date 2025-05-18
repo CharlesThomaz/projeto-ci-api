@@ -1,16 +1,60 @@
+# Nome do workflow (aparece na aba de Actions do GitHub)
+name: CI/CD - Flask Docker App
 
-name: CI 
-on: 
+# Define quando o workflow será executado
+on:
   push:
-    branches:
-      - main 
+    branches: [ "main" ]  # Executa quando houver push na branch main
+  pull_request:
+    branches: [ "main" ]  # Executa quando houver pull request para a branch main
 
-jobs: 
-  build:
-    name: 'Build and Push'
-    runs-on: ubuntu-latest
-    
+# Define o(s) job(s) que serão executados
+jobs:
+  build-and-test:  # Nome do job (pode ser qualquer nome)
+    runs-on: ubuntu-latest  # Define a máquina virtual (runner) usada para rodar esse job
+
+    services:
+      mysql:  # Nome do serviço MySQL que será iniciado
+        image: mysql:5.7  # Imagem do Docker usada para o banco de dados
+        env:  # Variáveis de ambiente para configurar o MySQL
+          MYSQL_ROOT_PASSWORD: root  # Senha do usuário root
+          MYSQL_DATABASE: flaskdb  # Banco de dados que será criado automaticamente
+        ports:
+          - 3306:3306  # Mapeia a porta do container para a máquina do runner
+        options: >-  # Configura um healthcheck para o container MySQL
+          --health-cmd="mysqladmin ping --silent"  # Comando usado para verificar se o MySQL está pronto
+          --health-interval=10s  # Intervalo entre as tentativas
+          --health-timeout=5s  # Tempo limite para cada tentativa
+          --health-retries=3  # Número máximo de tentativas
+
     steps:
-      - uses: actions/checkout@v4
+      - name: ⬇️ Checkout do código
+        uses: actions/checkout@v3  # Faz o clone do repositório dentro do runner
 
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4  # Instala o Python
+        with:
+          python-version: "3.11"  # Define a versão do Python usada no ambiente
 
+      - name: 📦 Instalar dependências
+        run: |
+          python -m pip install --upgrade pip  # Atualiza o pip
+          pip install -r requirements.txt  # Instala as dependências da aplicação Flask
+
+      - name: ✅ Testar conexão com banco MySQL
+        run: |
+          sudo apt-get install -y mysql-client  # Instala o cliente MySQL para poder usar o comando `mysql`
+          mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"  # Testa a conexão com o MySQL e lista os bancos
+
+      - name: 🐳 Validar Dockerfile
+        run: docker build -t flask-app .  # Faz o build da imagem Docker da aplicação
+
+      - name: 🧪 Rodar testes com pytest
+  env:
+    FLASK_ENV: testing
+    DB_HOST: 127.0.0.1
+    DB_USER: root
+    DB_PASSWORD: root
+    DB_NAME: flaskdb
+  run: |
+    pytest
