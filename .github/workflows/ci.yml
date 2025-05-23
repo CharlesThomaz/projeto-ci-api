@@ -59,6 +59,12 @@ jobs:
       - name: ✅ Testar conexão com banco MySQL
         run: mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"
       
-
+      - name: 🧪 Generate tag
+        id: generate-tag
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+      
+      
       - name: Build docker image
-        run: docker build -t flask-app-ci:latest .
+        run: docker build -t flask-app-ci:${{steps.generate-tag.outputs.sha}} .
