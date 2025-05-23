@@ -75,7 +75,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: charlesthomaz/flask-app-ci:${{steps.generate-tag.outputs.sha}}:latest       
+          tags: charlesthomaz/flask-app-ci:${{steps.generate-tag.outputs.sha}},charlesthomaz/flask-app-ci:latest       
       
       
       # - name: Build docker image
