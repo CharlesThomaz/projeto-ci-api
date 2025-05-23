@@ -58,3 +58,7 @@ jobs:
 
       - name: ✅ Testar conexão com banco MySQL
         run: mysql -h 127.0.0.1 -u root -proot -e "SHOW DATABASES;"
+      
+
+      - name: Build docker image
+        run: docker build -t flask-app-ci:latest .
