@@ -29,14 +29,15 @@ def add_item():
     item_data = request.get_json()
     
     # Verifica se os dados necessários estão presentes
-    if not item_data or 'name' not in item_data:
+    if not item_data or 'nome' not in item_data:
         return jsonify({'error': 'Nome do item é obrigatório'}), 400
+
     
-    name = item_data['name']
+    nome = item_data['nome']
 
     # Adiciona o item ao banco de dados
     cur = mysql.connection.cursor()
-    cur.execute('INSERT INTO items (name) VALUES (%s)', (name,))
+    cur.execute('INSERT INTO items (nome) VALUES (%s)', (nome,))
     mysql.connection.commit()
     cur.close()
 
